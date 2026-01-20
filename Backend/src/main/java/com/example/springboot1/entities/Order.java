@@ -1,0 +1,42 @@
+package com.example.springboot1.entities;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+
+@Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "orders")
+public class Order {
+@Id
+@GeneratedValue(strategy = GenerationType.IDENTITY)
+private Long id;
+
+
+@ManyToOne
+private User user;
+
+
+private Double total;
+
+
+private String status; // CREATED, PAID, SHIPPED, CANCELLED
+
+
+private LocalDateTime createdAt = LocalDateTime.now();
+
+
+private String shippingAddress;
+
+
+@OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+private List<OrderItem> items = new ArrayList<>();
+}
