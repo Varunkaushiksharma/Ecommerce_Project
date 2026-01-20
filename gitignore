@@ -1,0 +1,12 @@
+# Java
+*.class
+*.jar
+*.war
+*.log
+target/
+out/
+
+# Node / React
+node_modules/
+build/
+.env
