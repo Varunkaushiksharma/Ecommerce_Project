@@ -2,11 +2,13 @@ package com.example.springboot1.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import com.fasterxml.jackson.annotation.*;
 
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.time.LocalDate;
 
 
 @Entity
@@ -35,8 +37,12 @@ private LocalDateTime createdAt = LocalDateTime.now();
 
 
 private String shippingAddress;
+private LocalDate shippedDate;
+private LocalDate deliveredDate;
+private LocalDate estimatedDeliveryDate;
 
 
 @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+@JsonManagedReference
 private List<OrderItem> items = new ArrayList<>();
 }

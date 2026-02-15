@@ -1,14 +1,10 @@
 package com.example.springboot1.Configuration;
 
-
 import com.example.springboot1.security.JwtAuthFilter;
 import com.example.springboot1.security.JwtUtils;
 import com.example.springboot1.service.UserService;
-// import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-// import org.springframework.security.authentication.AuthenticationManager;
-// import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -19,15 +15,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-
 @Configuration
-// @RequiredArgsConstructor
 @EnableMethodSecurity
 public class SecurityConfig {
 
-
-   private final JwtUtils jwtUtils;
-    // private final UserService userService;
+    private final JwtUtils jwtUtils;
 
     public SecurityConfig(JwtUtils jwtUtils) {
         this.jwtUtils = jwtUtils;
@@ -36,20 +28,31 @@ public class SecurityConfig {
     @Bean
     public JwtAuthFilter jwtAuthFilter(UserService userService) {
         JwtAuthFilter filter = new JwtAuthFilter(jwtUtils);
-        filter.setUserService(userService); // setter injection
+        filter.setUserService(userService);
         return filter;
     }
 
-
-  @Bean
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthFilter jwtAuthFilter) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
-            .cors(cors -> {}) 
+            .cors(cors -> {}) // we configure CORS below
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**", "/actuator/**", "/swagger-ui/**", "/v3/api-docs/**","/api/products", "/api/categories","/uploads/**").permitAll()
+                // public endpoints
+                .requestMatchers(
+                    "/api/auth/**",
+                    "/actuator/**",
+                    "/swagger-ui/**",
+                    "/v3/api-docs/**",
+                    "/api/products/**",
+                    "/api/categories/**",
+                    "/uploads/**",
+                    "/products/allorders"  // <- now truly public
+                ).permitAll()
+                // admin-only
                 .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
+                // everything else requires auth
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
@@ -57,12 +60,10 @@ public class SecurityConfig {
         return http.build();
     }
 
-
-
-@Bean
-public PasswordEncoder passwordEncoder() {
-return new BCryptPasswordEncoder();
-}
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
     @Bean
     public WebMvcConfigurer corsConfigurer() {
@@ -70,12 +71,11 @@ return new BCryptPasswordEncoder();
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                .allowedOrigins("http://localhost:3000")
-                .allowedMethods("*")
-                .allowedHeaders("*")
-                .allowCredentials(true);
+                        .allowedOrigins("http://localhost:3000") // explicitly your React frontend
+                        .allowedMethods("*")
+                        .allowedHeaders("*")
+                        .allowCredentials(true); // now valid because origin is explicit
             }
         };
     }
 }
-

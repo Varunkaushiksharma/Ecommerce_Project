@@ -22,32 +22,46 @@ public class OrderService {
 private final OrderRepository orderRepository;
 private final ProductRepository productRepository;
 
-@Transactional
-public Order createOrderFromCart(User user, Cart cart, String shippingAddress) {
-if(cart.getItems() == null || cart.getItems().isEmpty()) {
-    throw new RuntimeException("Cart is empty, cannot create order");
-}
-Order o = new Order();
-o.setUser(user);
-o.setStatus("CREATED");
-o.setShippingAddress(shippingAddress);
-double total = 0.0;
-for (CartItem ci : cart.getItems()) {
-OrderItem oi = new OrderItem();
-oi.setProduct(ci.getProduct());
-oi.setQty(ci.getQty());
-double price = productRepository.findById(ci.getProduct().getId())
-                 .orElseThrow(() -> new RuntimeException("Product not found"))
-                 .getPrice();
-oi.setPrice(price);
-oi.setOrder(o);
-o.getItems().add(oi);
-total += ci.getQty() * price;
-}
-o.setTotal(total);
-return orderRepository.save(o);
-}
+    @Transactional
+    public Order createOrderFromCart(User user, Cart cart, String shippingAddress) {
+        if(cart.getItems() == null || cart.getItems().isEmpty()) {
+            throw new RuntimeException("Cart is empty, cannot create order");
+        }
+        Order o = new Order();
+        o.setUser(user);
+        o.setStatus("CREATED");
+        o.setShippingAddress(shippingAddress);
+        double total = 0.0;
+        for (CartItem ci : cart.getItems()) {
+            OrderItem oi = new OrderItem();
+            oi.setProduct(ci.getProduct());
+            oi.setQty(ci.getQty());
+            double price = productRepository
+                            .findById(ci.getProduct().getId())
+                            .orElseThrow(() -> new RuntimeException("Product not found"))
+                            .getPrice();
+            oi.setPrice(price);
+            oi.setOrder(o);
+            o.getItems().add(oi);
+            total += ci.getQty() * price;
+        }
+    o.setTotal(total);
+    return orderRepository.save(o);
+    }
 
 
-public List<Order> listAll() { return orderRepository.findAll(); }
+    public List<Order> listAll() { 
+        return orderRepository.findAll(); 
+    }
+
+    public List<Order> getOrdersForUser(User user) {
+        return orderRepository.findByUser(user);
+    }
+
+    public Order getOrderById(Long id) {
+        return orderRepository.findById(id).orElseThrow(() -> new RuntimeException("Order not found"));
+    }
+
+    
+
 }

@@ -10,6 +10,10 @@ import AdminDashBoard from "./AdminDashboard";
 import AdminAuth from "./pages/AdminAuth";
 import AdminPrivateRoute from "./AdminPrivateRoute";
 import AdminRedirect from "./AdminRedirect";
+import CheckoutPage from "./pages/CheckoutPage";
+import OrderSuccessPage from "./pages/OrderSuccessPage";
+import AdminOrderPage from "./AdminOrderPage";
+import OrderDetailsPage from "./pages/OrderDetailsPage";
 
 export default function App() {
   return (
@@ -23,6 +27,7 @@ export default function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/order/:id" element={<OrderDetailsPage />} /> 
           <Route path="/products" element={<Products />} />
           <Route path="/cart" element={<Cart />} />
           {/* Always redirect /admin */}
@@ -34,8 +39,12 @@ export default function App() {
           {/* Protected admin routes */}
           <Route element={<AdminPrivateRoute />}>
             <Route path="/admin/dashboard" element={<AdminDashBoard />} />
+            <Route path="/admin/orders" element={<AdminOrderPage />} />
             {/* add more admin routes here */}
           </Route>
+
+          <Route path="/checkout" element={<CheckoutPage />} />
+           <Route path="/order-success" element={<OrderSuccessPage />} />
         </Routes>
     </CartProvider>
   );

@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 
 export default function AdminDashboard() {
   const [products, setProducts] = useState([]);
+  const [stats, setStats] = useState(null);
   const [form, setForm] = useState({
     title: "",
     price: "",
@@ -16,6 +18,23 @@ export default function AdminDashboard() {
     fetch("http://localhost:8080/api/products")
       .then((res) => res.json())
       .then((data) => setProducts(data));
+  }, []);
+
+  //fetch stats
+  useEffect(() => {
+  fetch("http://localhost:8080/api/products")
+    .then((res) => res.json())
+    .then((data) => setProducts(data));
+
+  const token = localStorage.getItem("token");
+
+  fetch("http://localhost:8080/api/orders/stats", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+    .then((res) => res.json())
+    .then((data) => setStats(data));
   }, []);
 
   // Handle form input
@@ -86,6 +105,41 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
+      {stats && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+          <div className="bg-white p-6 rounded-xl shadow">
+            <h2 className="text-gray-500">Total Orders</h2>
+            <p className="text-2xl font-bold">{stats.totalOrders}</p>
+          </div>
+
+          <div className="bg-white p-6 rounded-xl shadow">
+            <h2 className="text-gray-500">Total Revenue</h2>
+              <p className="text-2xl font-bold">
+                ₹{stats.totalRevenue?.toFixed(2)}
+              </p>
+            </div>
+
+            <div className="bg-white p-6 rounded-xl shadow">
+              <h2 className="text-gray-500">Cancelled</h2>
+              <p className="text-2xl font-bold text-red-600">
+                {stats.cancelledOrders}
+              </p>
+            </div>
+
+            <div className="bg-white p-6 rounded-xl shadow">
+              <h2 className="text-gray-500">Delivered</h2>
+              <p className="text-2xl font-bold text-green-600">
+                {stats.deliveredOrders}
+              </p>
+            </div>
+          </div>
+        )}
+      <Link
+        to="/admin/orders"
+        className="mb-4 inline-block px-4 py-2 bg-green-600 text-white rounded-lg"
+      >
+        View Orders
+      </Link>
 
       {/* Form */}
       <div className="bg-white p-6 rounded-xl shadow-md mb-8">

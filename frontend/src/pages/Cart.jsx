@@ -1,9 +1,11 @@
 import React, { useContext } from "react";
 import Navbar from "../Component/Navbar";
 import { CartContext } from "../CartContext";
+import { useNavigate } from "react-router-dom";
 
 export default function CartPage() {
   const { cartItems, loading, removeItem, totalPrice } = useContext(CartContext);
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900">
@@ -60,6 +62,14 @@ export default function CartPage() {
 
             <div className="flex justify-end mt-4 text-lg font-semibold">
               Total: ₹{totalPrice.toFixed(2)}
+            </div>
+            <div className="flex justify-end mt-4">
+              <button
+                onClick={() => navigate("/checkout")}
+                className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500 transition"
+              >
+                Proceed to Checkout
+              </button>
             </div>
           </div>
         )}

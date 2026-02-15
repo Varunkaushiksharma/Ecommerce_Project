@@ -3,6 +3,7 @@ package com.example.springboot1.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import com.fasterxml.jackson.annotation.*;
 
 
 import java.time.LocalDateTime;
@@ -29,7 +30,7 @@ private String username;
 @Column(unique = true)
 private String email;
 
-
+@JsonIgnore
 private String password;
 
 

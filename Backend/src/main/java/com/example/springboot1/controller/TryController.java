@@ -20,14 +20,18 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.springboot1.entities.Try;
 import com.example.springboot1.repository.TryRepository;
 // import com.example.springboot1.service.TryService;
-
+import com.example.springboot1.repository.OrderRepository;
+import com.example.springboot1.entities.Order;
 @RestController
-@CrossOrigin(origins = "*")
+// @CrossOrigin(origins = "*")
 @RequestMapping("/products")
 public class TryController {
 
     @Autowired
     private TryRepository repo;
+    @Autowired
+    private OrderRepository orderRepository;
+
     // @Autowired
     // private TryService service;
 
@@ -55,6 +59,12 @@ public class TryController {
                 .contentType(MediaType.IMAGE_JPEG)
                 .body(p.getFile());
     }
+
+
+    // @GetMapping("/allorders")
+    // public ResponseEntity<?> getallorders(){
+    //     return ResponseEntity.ok(orderRepository.findAll());
+    // }
 
 
 }
