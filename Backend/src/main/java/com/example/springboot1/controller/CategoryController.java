@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.springboot1.entities.Category;
+// import com.example.springboot1.entities.Category;
 import com.example.springboot1.repository.CategoryRepository;
 
 import lombok.RequiredArgsConstructor;
