@@ -14,6 +14,9 @@ import CheckoutPage from "./pages/CheckoutPage";
 import OrderSuccessPage from "./pages/OrderSuccessPage";
 import AdminOrderPage from "./AdminOrderPage";
 import OrderDetailsPage from "./pages/OrderDetailsPage";
+import View from "./pages/View";
+import Map from "./pages/Map";
+import "leaflet/dist/leaflet.css";
 
 export default function App() {
   return (
@@ -44,7 +47,10 @@ export default function App() {
           </Route>
 
           <Route path="/checkout" element={<CheckoutPage />} />
+
            <Route path="/order-success" element={<OrderSuccessPage />} />
+           <Route path="/view/:id" element={<View />} />
+           <Route path="/map" element={<Map />} />
         </Routes>
     </CartProvider>
   );

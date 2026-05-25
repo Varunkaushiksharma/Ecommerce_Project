@@ -31,12 +31,6 @@ export default function Navbar({ search, setSearch }) {
               <Link to="/products" className="px-3 py-2 rounded hover:bg-gray-200">
                 Products
               </Link>
-              <a className="px-3 py-2 rounded hover:bg-gray-200" href="#about">
-                About
-              </a>
-              <a className="px-3 py-2 rounded hover:bg-gray-200" href="#contact">
-                Contact
-              </a>
             </nav>
           </div>
 

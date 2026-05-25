@@ -1,8 +1,10 @@
 import React, { useContext } from "react";
 import { CartContext } from "../CartContext"; // import your context
+import { useNavigate } from "react-router-dom";
 
 export default function Products({ loading, filtered }) {
   const { addToCart } = useContext(CartContext);
+  const navigate = useNavigate();
 
   return (
     <section id="products" className="py-8">
@@ -37,9 +39,13 @@ export default function Products({ loading, filtered }) {
                   <div className="h-44 bg-gray-50 rounded-lg flex items-center justify-center overflow-hidden">
                     {p.imageUrl ? (
                       <img
-                        src={`http://localhost:8080${p.imageUrl}`}
-                        alt={p.title || p.name}
-                        className="object-contain h-full w-full"
+                          src={
+                            p.imageUrl?.startsWith("http")
+                              ? p.imageUrl
+                              : `http://localhost:8080${p.imageUrl}`
+                          }
+                          alt={p.title || p.name}
+                          className="object-contain h-full w-full"
                       />
                     ) : (
                       <div className="text-gray-400">No image</div>
@@ -62,11 +68,17 @@ export default function Products({ loading, filtered }) {
                       {p.price ? `₹${p.price}` : "—"}
                     </div>
                     <button
+                      onClick={() =>navigate(`/view/${p.id || p._id}`)}
+                      className="px-4 py-2 rounded-lg bg-gray-900 text-white text-sm hover:bg-gray-800 active:scale-95 transition"
+                    >
+                      View
+                    </button>
+                    {/* <button
                       onClick={() => addToCart(p.id || p._id, 1)}
                       className="px-4 py-2 rounded-lg bg-gray-900 text-white text-sm hover:bg-gray-800 active:scale-95 transition"
                     >
                       Add
-                    </button>
+                    </button> */}
                   </div>
                 </article>
               ))}
