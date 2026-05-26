@@ -11,7 +11,7 @@ export default function Home() {
   const fetchProducts = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await fetch(`${API_BASE}/api/products`, {
+      const res = await fetch(`${API_BASE}/api/products/all`, {
         credentials: "include",
       });
       if (!res.ok) throw new Error("Failed to fetch products");

@@ -17,7 +17,7 @@ export default function ProductsPage() {
       try {
         setLoading(true);
         const token = localStorage.getItem("token");
-        const res = await fetch(`${API_BASE}/api/products`, {
+        const res = await fetch(`${API_BASE}/api/products/all`, {
           headers: {
             "Authorization": `Bearer ${token}`,
             "Content-Type": "application/json",

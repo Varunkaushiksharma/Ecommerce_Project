@@ -39,13 +39,13 @@ public class JwtUtils {
     }
 
 
-    public String generateToken(String username,boolean isAdmin) {
+    public String generateToken(String email,boolean isAdmin) {
 
         long jwtExpirationMs = isAdmin ? adminExpiration : userExpiration;
         Date now = new Date();
         Date exp = new Date(now.getTime() + jwtExpirationMs);
         return Jwts.builder()
-        .setSubject(username)
+        .setSubject(email)
         .setIssuedAt(now)
         .setExpiration(exp)
         .signWith(key)
@@ -53,7 +53,7 @@ public class JwtUtils {
     }
 
 
-    public String getUsernameFromJwt(String token) {
+    public String getEmailFromJwt(String token) {
         return Jwts.parserBuilder().setSigningKey(key).build()
         .parseClaimsJws(token).getBody().getSubject();
     }

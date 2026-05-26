@@ -14,6 +14,7 @@ export default function Signup() {
     });
 
     if (res.ok) {
+      alert("Registration successful! Please check your email to verify your account.");
       navigate("/login"); // after signup redirect to login
     } else {
       const error = await res.json();
@@ -45,7 +46,7 @@ export default function Signup() {
       />
       <button
         type="submit"
-        className="w-full bg-gray-900 text-white py-2 rounded-md hover:bg-gray-800 transition"
+        className="w-full bg-gray-900 text-white py-2 rounded-md hover:bg-gray-800 transition cursor-pointer"
       >
         Sign Up
       </button>

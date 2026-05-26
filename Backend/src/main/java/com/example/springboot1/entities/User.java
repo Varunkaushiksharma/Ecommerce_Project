@@ -23,7 +23,7 @@ public class User {
 private Long id;
 
 
-@Column(unique = true)
+// @Column(unique = true)
 private String username;
 
 
@@ -36,6 +36,7 @@ private String password;
 
 private LocalDateTime createdAt = LocalDateTime.now();
 
+private boolean enabled = false;
 
 @ManyToMany(fetch = FetchType.EAGER)
 @JoinTable(name = "user_roles",

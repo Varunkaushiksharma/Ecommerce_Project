@@ -17,6 +17,7 @@ import OrderDetailsPage from "./pages/OrderDetailsPage";
 import View from "./pages/View";
 import Map from "./pages/Map";
 import "leaflet/dist/leaflet.css";
+import VerifyEmail from "./pages/VerifyEmail";
 
 export default function App() {
   return (
@@ -51,6 +52,7 @@ export default function App() {
            <Route path="/order-success" element={<OrderSuccessPage />} />
            <Route path="/view/:id" element={<View />} />
            <Route path="/map" element={<Map />} />
+           <Route path="/verify-email" element={<VerifyEmail />} />
         </Routes>
     </CartProvider>
   );

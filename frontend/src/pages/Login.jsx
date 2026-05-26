@@ -70,8 +70,12 @@ export default function Login() {
       });
 
       if (!res.ok) {
-        const error = await res.json();
-        alert(error.error || "Login failed");
+         const error = await res.json();
+          if (res.status === 403) {
+            alert("Please verify your email first. Check your inbox.");
+          } else {
+            alert(error.error || "Login failed");
+          }
         return;
       }
 
@@ -97,9 +101,9 @@ export default function Login() {
     >
       <h2 className="text-2xl font-semibold mb-6 text-gray-900">Login</h2>
       <input
-        placeholder="Username"
-        value={form.username}
-        onChange={(e) => setForm({ ...form, username: e.target.value })}
+        placeholder="Email"
+        value={form.email}
+        onChange={(e) => setForm({ ...form, email: e.target.value })}
         className="w-full mb-4 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-300"
       />
       <input

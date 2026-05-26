@@ -20,7 +20,7 @@ public class ProductController {
 private final ProductService productService;
 
 
-@GetMapping
+@GetMapping("/all")
 public ResponseEntity<List<Product>> list() { return ResponseEntity.ok(productService.listAll()); }
 
 

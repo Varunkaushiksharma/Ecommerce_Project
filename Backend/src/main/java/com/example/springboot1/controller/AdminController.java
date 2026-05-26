@@ -89,7 +89,7 @@ public ResponseEntity<?> updateProduct(
     @RequestParam(required = false) Long categoryId,
     @RequestPart(value = "file", required = false) MultipartFile file) {
 
-    Product existing = productService.findById(id)
+    Product existing = productService.get(id)
         .orElseThrow(() -> new RuntimeException("Product not found"));
     
     if (title != null) existing.setTitle(title);
