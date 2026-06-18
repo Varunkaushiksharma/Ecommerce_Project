@@ -10,9 +10,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.springboot1.DTO.ForgetPassword;
 import com.example.springboot1.entities.User;
 import com.example.springboot1.security.JwtUtils;
 import com.example.springboot1.service.UserService;
+import com.example.springboot1.DTO.LoginDTO;
+import com.example.springboot1.DTO.SignUpDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -30,36 +33,25 @@ public class AuthController {
 
      // 🔹 Normal user registration
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody Map<String, String> body) {
-        String username = body.get("username");
-        String email = body.get("email");
-        String password = body.get("password");
+    public ResponseEntity<?> registerUser(@RequestBody SignUpDTO body) {
+        String username = body.getUsername();
+        String email = body.getEmail();
+        String password = body.getPassword();
         if (userService.findByEmail(email).isPresent()) {
             return ResponseEntity
                     .badRequest()
                     .body(Map.of("error", "Email already exists"));
         }
 
-        User u = userService.registerUser(username, email, password, "ROLE_USER");
+        User u = userService.registerUser(username, email, password);
         return ResponseEntity.ok(Map.of("msg", "registered as USER", "email", u.getEmail()));
-    }
-
-    // 🔹 Admin registration
-    @PostMapping("/register-admin")
-    public ResponseEntity<?> registerAdmin(@RequestBody Map<String, String> body) {
-        String username = body.get("username");
-        String email = body.get("email");
-        String password = body.get("password");
-
-        User u = userService.registerUser(username, email, password, "ROLE_ADMIN");
-        return ResponseEntity.ok(Map.of("msg", "registered as ADMIN", "email", u.getEmail()));
     }
 
     // 🔹 Login
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> body) {
-        String email = body.get("email");
-        String password = body.get("password");
+    public ResponseEntity<?> login(@RequestBody LoginDTO body) {
+        String email = body.getEmail();
+        String password = body.getPassword();
 
         var userOpt = userService.findByEmail(email);
         if (userOpt.isEmpty()) {
@@ -77,8 +69,9 @@ public class AuthController {
         if (!passwordEncoder.matches(password, user.getPassword())) {
             return ResponseEntity.status(401).body(Map.of("error", "invalid credentials"));
         }
-        boolean isAdmin = body.get("email").equals("admin@example.com"); // Replace with actual admin email check
-        String token = jwtUtils.generateToken(user.getEmail(), isAdmin);
+        
+        // boolean isAdmin = body.get("email").equals("admin@example.com"); // Replace with actual admin email check
+        String token = jwtUtils.generateToken(user.getEmail(), "AUTH");
         return ResponseEntity.ok(Map.of("token", token, "email", user.getEmail()));
     }
 
@@ -89,6 +82,13 @@ public class AuthController {
             return ResponseEntity
                     .badRequest()
                     .body(Map.of("error", "Invalid token"));
+        }
+        if (!jwtUtils.getTokenType(token)
+            .equals("EMAIL_VERIFICATION")) {
+
+        return ResponseEntity
+                .badRequest()
+                .body(Map.of("error", "Invalid token type"));
         }
 
         String email =
@@ -112,5 +112,27 @@ public class AuthController {
         return ResponseEntity.ok(
                 Map.of("msg", "Email verified successfully")
         );
+    }
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody ForgetPassword body) {
+        
+        try {
+            userService.forgotPassword(body.getEmail());
+            return ResponseEntity.ok(Map.of("msg", "Password reset email sent"));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> body) {
+        String token = body.get("token");
+        String newPassword = body.get("newPassword");
+
+        try {
+            userService.resetPassword(token, newPassword);
+            return ResponseEntity.ok(Map.of("msg", "Password reset successfully"));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 }

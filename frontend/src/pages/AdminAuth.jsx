@@ -1,12 +1,8 @@
 import React, { useState } from "react";
 
 export default function AdminAuth() {
-  const [isLogin, setIsLogin] = useState(true);
-  const [form, setForm] = useState({
-    username: "",
-    email: "",
-    password: "",
-  });
+  const [form, setForm] = useState({ email: "", password: "" });
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -14,56 +10,54 @@ export default function AdminAuth() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
 
-    const url = isLogin
-      ? "http://localhost:8080/api/auth/login"
-      : "http://localhost:8080/api/auth/register-admin";
-
-    const res = await fetch(url, {
+    const res = await fetch("http://localhost:8080/api/admin/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form),
     });
 
-    const data = await res.json();
+    let data = {};
+
+    try {
+      data = await res.json();
+    } catch (e) {
+      setError("Invalid server response");
+      return;
+    }
 
     if (res.ok) {
-      if (isLogin) {
-        sessionStorage.setItem("admin_token", data.token);
-        alert("Login successful!");
-        window.location.href = "/admin/dashboard"; // redirect to dashboard
-      } else {
-        alert("Admin registered successfully! Now login.");
-        setIsLogin(true);
-      }
+      // Check if the user is actually admin by decoding token
+      const payload = JSON.parse(atob(data.token.split('.')[1]));
+      console.log("Logged in as:", payload.sub);
+
+      sessionStorage.setItem("admin_token", data.token);
+      window.location.href = "/admin/dashboard";
     } else {
-      alert(data.error || "Failed");
+      setError(data.error || "Login failed");
     }
   };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
       <div className="bg-white p-8 rounded-xl shadow-md w-96">
-        <h2 className="text-2xl font-bold mb-4 text-center">
-          {isLogin ? "Admin Login" : "Register Admin"}
-        </h2>
+        <h2 className="text-2xl font-bold mb-4 text-center">Admin Login</h2>
+
+        {error && (
+          <div className="bg-red-100 text-red-600 p-2 rounded mb-4 text-sm">
+            {error}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-4">
-          {!isLogin && (
-            <input
-              type="email"
-              name="email"
-              placeholder="Email"
-              value={form.email}
-              onChange={handleChange}
-              className="border rounded-lg p-2 w-full"
-            />
-          )}
           <input
-            type="text"
-            name="username"
-            placeholder="Username"
-            value={form.username}
+            type="email"
+            name="email"
+            placeholder="Admin Email"
+            value={form.email}
             onChange={handleChange}
+            required
             className="border rounded-lg p-2 w-full"
           />
           <input
@@ -72,38 +66,16 @@ export default function AdminAuth() {
             placeholder="Password"
             value={form.password}
             onChange={handleChange}
+            required
             className="border rounded-lg p-2 w-full"
           />
           <button
             type="submit"
             className="w-full bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700"
           >
-            {isLogin ? "Login" : "Register"}
+            Login
           </button>
         </form>
-        <p className="mt-4 text-center text-sm text-gray-500">
-          {isLogin ? (
-            <>
-              Don’t have an account?{" "}
-              <button
-                onClick={() => setIsLogin(false)}
-                className="text-blue-600 underline"
-              >
-                Register
-              </button>
-            </>
-          ) : (
-            <>
-              Already registered?{" "}
-              <button
-                onClick={() => setIsLogin(true)}
-                className="text-blue-600 underline"
-              >
-                Login
-              </button>
-            </>
-          )}
-        </p>
       </div>
     </div>
   );

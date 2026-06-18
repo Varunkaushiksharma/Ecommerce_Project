@@ -48,7 +48,7 @@ public class CartController {
     @PostMapping("/add")
     public ResponseEntity<?> add(@AuthenticationPrincipal UserDetails ud,
                                  @RequestBody CartItemRequest request) {
-        var user = userRepository.findByUsername(ud.getUsername()).orElseThrow();
+        var user = userRepository.findByEmail(ud.getUsername()).orElseThrow();
         Cart cart = cartService.addToCart(user, request.getProductId(), request.getQty());
         return ResponseEntity.ok(toDTO(cart));
     }
@@ -56,7 +56,7 @@ public class CartController {
     // ✅ Get cart
     @GetMapping
     public ResponseEntity<?> get(@AuthenticationPrincipal UserDetails ud) {
-        var user = userRepository.findByUsername(ud.getUsername()).orElseThrow();
+        var user = userRepository.findByEmail(ud.getUsername()).orElseThrow();
         Cart cart = cartService.getOrCreateCart(user);
         return ResponseEntity.ok(toDTO(cart));
     }
@@ -65,7 +65,7 @@ public class CartController {
     @DeleteMapping("/remove/{itemId}")
     public ResponseEntity<?> remove(@AuthenticationPrincipal UserDetails ud,
                                     @PathVariable Long itemId) {
-        var user = userRepository.findByUsername(ud.getUsername()).orElseThrow();
+        var user = userRepository.findByEmail(ud.getUsername()).orElseThrow();
         Cart cart = cartService.removeFromCart(user, itemId);
         return ResponseEntity.ok(toDTO(cart));
     }

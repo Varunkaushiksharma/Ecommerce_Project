@@ -1,7 +1,5 @@
 import { Navigate } from "react-router-dom";
 
-const AdminRedirect = () => {
-  return <Navigate to="/admin/auth" replace />;
-};
-
-export default AdminRedirect;
+export default function AdminRedirect() {
+  return <Navigate to="/admin/auth" />;
+}

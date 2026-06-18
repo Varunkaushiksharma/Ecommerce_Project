@@ -5,11 +5,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@AllArgsConstructor
 @NoArgsConstructor
-@Getter
+@AllArgsConstructor
 @Setter
-public class LoginDTO {
+@Getter
+public class AdminCreateDTO {
+    private String username;
     private String email;
     private String password;
 }

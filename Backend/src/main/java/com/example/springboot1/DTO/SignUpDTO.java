@@ -1,6 +1,6 @@
 package com.example.springboot1.DTO;
 
-import org.springframework.web.multipart.MultipartFile;
+// import org.springframework.web.multipart.MultipartFile;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,9 +13,8 @@ import lombok.Setter;
 @Setter
 public class SignUpDTO {
 
-    private String name;
-    private int id;
+    private String username;
+    private String email;
     private String password;
-    private MultipartFile avatar;
 
 }

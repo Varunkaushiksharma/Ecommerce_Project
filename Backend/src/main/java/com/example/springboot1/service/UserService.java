@@ -1,22 +1,17 @@
 package com.example.springboot1.service;
 import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.example.springboot1.entities.Role;
 import com.example.springboot1.entities.User;
-import com.example.springboot1.repository.RoleRepository;
 import com.example.springboot1.repository.UserRepository;
 import com.example.springboot1.security.JwtUtils;
 
 import lombok.RequiredArgsConstructor;
-
+import static java.util.Collections.emptyList;
 
 @Service
 @RequiredArgsConstructor
@@ -24,26 +19,22 @@ public class UserService implements UserDetailsService {
 
 
 private final UserRepository userRepository;
-private final RoleRepository roleRepository;
 private final PasswordEncoder passwordEncoder;
 private final EmailService emailService;
 private final JwtUtils jwtUtils;
 
 
-  public User registerUser(String username, String email, String rawPassword, String roleName) {
+  public User registerUser(String username, String email, String rawPassword) {
         User u = new User();
         u.setUsername(username);
         u.setEmail(email);
         u.setPassword(passwordEncoder.encode(rawPassword));
 
         u.setEnabled(false);
-        // Find role by name or create if not exists
-        Role role = roleRepository.findByName(roleName)
-                .orElseGet(() -> roleRepository.save(new Role(null, roleName)));
-        u.getRoles().add(role);
+       
         User saved = userRepository.save(u);
 
-        String token = jwtUtils.generateToken(saved.getEmail(), false);
+        String token = jwtUtils.generateToken(saved.getEmail(), "EMAIL_VERIFICATION");
 
         emailService.sendVerificationEmail(
                 saved.getEmail(),
@@ -56,16 +47,16 @@ private final JwtUtils jwtUtils;
 
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> userOptional = userRepository.findByUsername(username);
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        Optional<User> userOptional = userRepository.findByEmail(email);
         if (userOptional.isEmpty()) throw new UsernameNotFoundException("User not found");
         User user = userOptional.get();
-        var authorities = user.getRoles()
-                              .stream()
-                              .map(Role::getName)
-                              .map(SimpleGrantedAuthority::new)
-                              .collect(Collectors.toList());
-        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
+        
+        return new org.springframework.security.core.userdetails.User(
+            user.getEmail(), 
+            user.getPassword(),
+            emptyList() 
+            );
     }
 
 
@@ -73,28 +64,36 @@ private final JwtUtils jwtUtils;
         return userRepository.findByUsername(username);
     }
 
-    public UserDetails loadUserByEmail(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() ->
-                        new UsernameNotFoundException("User not found"));
-
-        var authorities = user.getRoles().stream()
-                .map(Role::getName)
-                .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toList());
-
-        return new org.springframework.security.core.userdetails.User(
-                user.getEmail(),
-                user.getPassword(),
-                authorities
-        );
-    }
-
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
     }
 
     public User save(User user) {
+        return userRepository.save(user);
+    }
+    public void forgotPassword(String email){
+        userRepository.findByEmail(email)
+                .ifPresent(user ->{
+                 String token = 
+                            jwtUtils.generateToken(user.getEmail(), "PASSWORD_RESET");
+
+                 emailService
+                 .sendPasswordResetEmail(
+                    user.getEmail(), token
+                );
+            });
+    }   
+    public User resetPassword(String token, String newPassword) {
+        if (!jwtUtils.getTokenType(token).equals("PASSWORD_RESET")) {
+            throw new RuntimeException("Invalid token");
+        }
+
+        String email = jwtUtils.getEmailFromJwt(token);
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setPassword(passwordEncoder.encode(newPassword));
         return userRepository.save(user);
     }
 }

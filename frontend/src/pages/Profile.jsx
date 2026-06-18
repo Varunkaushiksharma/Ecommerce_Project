@@ -9,6 +9,7 @@ import {
   User,
   Camera,
   ShoppingBag,
+  Package,
 } from "lucide-react";
 
 export default function Profile() {

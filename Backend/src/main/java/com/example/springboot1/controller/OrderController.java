@@ -43,14 +43,14 @@ private final OrderRepository orderRepository;
         if(ud == null) {
             return ResponseEntity.status(403).body("forbiden");
         }
-        var user = userRepository.findByUsername(ud.getUsername()).orElseThrow();
+        var user = userRepository.findByEmail(ud.getUsername()).orElseThrow();
         var orders = orderService.getOrdersForUser(user);
         return ResponseEntity.ok(orders);
     } 
 
     @PostMapping("/checkout")
     public ResponseEntity<?> checkout(@AuthenticationPrincipal UserDetails ud, @RequestBody Map<String, String> body) {
-        var user = userRepository.findByUsername(ud.getUsername()).orElseThrow();
+        var user = userRepository.findByEmail(ud.getUsername()).orElseThrow();
         Cart cart = cartService.getOrCreateCart(user);
         String shippingAddress = body.getOrDefault("shippingAddress", "-");
         Order order = orderService.createOrderFromCart(user, cart, shippingAddress);
@@ -95,7 +95,7 @@ private final OrderRepository orderRepository;
         String username = authentication.getName();
 
         // Allow only owner or admin
-        boolean isOwner = order.getUser().getUsername().equals(username);
+        boolean isOwner = order.getUser().getEmail().equals(username);
         boolean isAdmin = authentication.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
 
@@ -154,6 +154,7 @@ private final OrderRepository orderRepository;
         boolean isAdmin = authentication.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
 
+        System.out.println("Authorities: " + authentication.getAuthorities());
         if (!isAdmin) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }

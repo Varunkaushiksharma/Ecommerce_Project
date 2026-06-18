@@ -18,7 +18,8 @@ import View from "./pages/View";
 import Map from "./pages/Map";
 import "leaflet/dist/leaflet.css";
 import VerifyEmail from "./pages/VerifyEmail";
-
+import ForgetPassword from "./pages/ForgetPassword";
+import ResetPassword from "./pages/ResetPassword";
 export default function App() {
   return (
     <CartProvider>
@@ -30,6 +31,8 @@ export default function App() {
           {/* User Routes */}
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/forget-password" element={<ForgetPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/order/:id" element={<OrderDetailsPage />} /> 
           <Route path="/products" element={<Products />} />

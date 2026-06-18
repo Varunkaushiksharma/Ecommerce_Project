@@ -14,7 +14,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
+import com.example.springboot1.service.AdminService;
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfig {
@@ -26,9 +26,10 @@ public class SecurityConfig {
     }
 
     @Bean
-    public JwtAuthFilter jwtAuthFilter(UserService userService) {
+    public JwtAuthFilter jwtAuthFilter(UserService userService, AdminService adminService) {
         JwtAuthFilter filter = new JwtAuthFilter(jwtUtils);
         filter.setUserService(userService);
+        filter.setAdminService(adminService);
         return filter;
     }
 
@@ -46,14 +47,16 @@ public class SecurityConfig {
                     "/swagger-ui/**",
                     "/v3/api-docs/**",
                     "/api/products/**",
+                    // "/api/products",
                     "/api/categories/**",
                     "/uploads/**",
-                    "/products/allorders"  // <- now truly public
+                    "/api/admin/login",
+                    "/api/admin/create"
                 ).permitAll()
-                // admin-only
-                .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
-                // everything else requires auth
-                .anyRequest().authenticated()
+                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                 .requestMatchers("/api/products/**").hasAnyRole("USER", "ADMIN")
+                 .requestMatchers("/api/categories/**").hasAnyRole("USER", "ADMIN")
+                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 

@@ -18,20 +18,31 @@ import lombok.RequiredArgsConstructor;
 public class ProductService {
 private final ProductRepository productRepository;
 
-@Cacheable(value = "products")
-public List<Product> listAll() { return productRepository.findAll(); }
-@Cacheable(value = "product", key = "#id")
-public Optional<Product> get(Long id) { return productRepository.findById(id); }
-@Caching(evict ={
-    @CacheEvict(value = "products", allEntries = true),
-    @CacheEvict(value = "product", key = "#p.id")
-})
-public Product save(Product p) { return productRepository.save(p); }
-@Caching(evict ={
-    @CacheEvict(value = "products", allEntries = true),
-    @CacheEvict(value = "product", key = "#p.id")
-})
-public void delete(Long id) { productRepository.deleteById(id); }
+    @Cacheable(value = "products")
+    public List<Product> listAll(){ 
+        return productRepository.findAll(); 
+    }
+    
+    @Cacheable(value = "product", key = "#id")
+    public Optional<Product> get(Long id){
+         return productRepository.findById(id); 
+    }
+
+    @Caching(evict ={
+        @CacheEvict(value = "products", allEntries = true),
+        @CacheEvict(value = "product", key = "#p.id")
+    })
+    public Product save(Product p){
+         return productRepository.save(p); 
+    }
+
+    @Caching(evict ={
+        @CacheEvict(value = "products", allEntries = true),
+        @CacheEvict(value = "product", key = "#id")
+    })
+    public void delete(Long id){
+         productRepository.deleteById(id);
+    }
 
 
 }

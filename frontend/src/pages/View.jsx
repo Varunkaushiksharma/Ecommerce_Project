@@ -173,9 +173,9 @@ export default function View() {
                 >
                   Add to Cart
                 </button>
-                <button className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition transform hover:scale-[1.02] active:scale-95 duration-200">
+                {/* <button className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition transform hover:scale-[1.02] active:scale-95 duration-200">
                   Buy Now
-                </button>
+                </button> */}
               </div>
 
               {/* Seller Info */}

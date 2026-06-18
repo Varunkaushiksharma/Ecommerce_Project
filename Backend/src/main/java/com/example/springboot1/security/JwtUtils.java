@@ -39,13 +39,34 @@ public class JwtUtils {
     }
 
 
-    public String generateToken(String email,boolean isAdmin) {
+    public String generateToken(String email,String type) {
 
-        long jwtExpirationMs = isAdmin ? adminExpiration : userExpiration;
+        long expiration;
+        switch(type){
+            case "PASSWORD_RESET":
+                expiration = 1000 * 60 * 15; // 15 mins
+            break;
+
+            case "EMAIL_VERIFICATION":
+                expiration = 1000 * 60 * 60;
+            break;
+
+            case "AUTH":
+                expiration = userExpiration;
+            break;
+
+            case "ADMIN_AUTH":
+                expiration = adminExpiration;
+            break;
+            default:
+                throw new IllegalArgumentException("Invalid token type");
+        }
+
         Date now = new Date();
-        Date exp = new Date(now.getTime() + jwtExpirationMs);
+        Date exp = new Date(now.getTime() + expiration);
         return Jwts.builder()
         .setSubject(email)
+        .claim("type", type)
         .setIssuedAt(now)
         .setExpiration(exp)
         .signWith(key)
@@ -66,6 +87,15 @@ public class JwtUtils {
         } catch (JwtException e) {
             return false;
         }
+    }
+    public String getTokenType(String token) {
+    Claims claims = Jwts.parserBuilder()
+            .setSigningKey(key)
+            .build()
+            .parseClaimsJws(token)
+            .getBody();
+
+        return claims.get("type", String.class);
     }
     
 }
